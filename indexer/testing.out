@@ -1,0 +1,178 @@
+#!/bin/bash
+# testing.sh for TSE Indexer
+# Annabelle Hermey, November 2025
+
+
+echo "        INDEXER TESTING        "
+        INDEXER TESTING        
+
+
+
+# TESTS 1–8: INVALID ARGUMENT TESTS
+echo " Test 1: no arguments "
+ Test 1: no arguments 
+./indexer
+USAGE: indexer pageDirectory indexFilename
+echo
+
+
+echo " Test 2: one argument "
+ Test 2: one argument 
+./indexer ../data/letters
+USAGE: indexer pageDirectory indexFilename
+echo
+
+
+echo "Test 3: three or more arguments"
+Test 3: three or more arguments
+./indexer a b c
+USAGE: indexer pageDirectory indexFilename
+echo
+
+
+echo "Test 4: invalid pageDirectory (non-existent path)"
+Test 4: invalid pageDirectory (non-existent path)
+./indexer ../data/NoSuchDir output.index
+indexer: invalid pageDirectory
+echo
+
+
+echo "Test 5: invalid pageDirectory (NOT a crawler directory)"
+Test 5: invalid pageDirectory (NOT a crawler directory)
+mkdir -p notcrawler
+echo "hello" > notcrawler/randomfile
+./indexer notcrawler output.index
+indexer: invalid pageDirectory
+rm -rf notcrawler
+echo
+
+
+echo "Test 6: invalid indexFilename (non-existent path)"
+Test 6: invalid indexFilename (non-existent path)
+./indexer ../data/letters no/such/path/output.index
+indexer: cant write index file
+echo
+
+
+echo "Test 7: invalid indexFilename (read-only directory)"
+Test 7: invalid indexFilename (read-only directory)
+mkdir -p unwritable
+chmod 400 unwritable
+./indexer ../data/letters unwritable/out.index
+indexer: cant write index file
+chmod 755 unwritable
+rm -rf unwritable
+echo
+
+
+echo "Test 8: invalid indexFilename (existing read-only file)"
+Test 8: invalid indexFilename (existing read-only file)
+touch readonly.index
+chmod 400 readonly.index
+./indexer ../data/letters readonly.index
+indexer: cant write index file
+chmod 644 readonly.index
+rm -f readonly.index
+echo
+
+
+# VALID TESTS: INDEXER ON letters/
+
+echo " Valid Test: indexer on letters "
+ Valid Test: indexer on letters 
+./indexer ../data/letters letters.index
+echo "Created letters.index"
+Created letters.index
+echo
+
+
+echo " Valgrind: indexer on letters "
+ Valgrind: indexer on letters 
+valgrind --leak-check=full --show-leak-kinds=all \
+    ./indexer ../data/letters letters2.index
+==867438== Memcheck, a memory error detector
+==867438== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==867438== Using Valgrind-3.25.1 and LibVEX; rerun with -h for copyright info
+==867438== Command: ./indexer ../data/letters letters2.index
+==867438== 
+==867438== 
+==867438== HEAP SUMMARY:
+==867438==     in use at exit: 0 bytes in 0 blocks
+==867438==   total heap usage: 1,535 allocs, 1,535 frees, 131,919 bytes allocated
+==867438== 
+==867438== All heap blocks were freed -- no leaks are possible
+==867438== 
+==867438== For lists of detected and suppressed errors, rerun with: -s
+==867438== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+echo
+
+
+# VALID TESTS: INDEXER ON toscrape/
+echo " Valid Test: indexer on toscrape "
+ Valid Test: indexer on toscrape 
+./indexer ../data/toscrape toscrape.index
+echo "Created toscrape.index"
+Created toscrape.index
+echo
+
+
+echo " Valgrind: indexer on toscrape "
+ Valgrind: indexer on toscrape 
+valgrind --leak-check=full --show-leak-kinds=all \
+    ./indexer ../data/toscrape toscrape2.index
+==867450== Memcheck, a memory error detector
+==867450== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==867450== Using Valgrind-3.25.1 and LibVEX; rerun with -h for copyright info
+==867450== Command: ./indexer ../data/toscrape toscrape2.index
+==867450== 
+==867450== 
+==867450== HEAP SUMMARY:
+==867450==     in use at exit: 0 bytes in 0 blocks
+==867450==   total heap usage: 2,335,619 allocs, 2,335,619 frees, 42,741,853,829 bytes allocated
+==867450== 
+==867450== All heap blocks were freed -- no leaks are possible
+==867450== 
+==867450== For lists of detected and suppressed errors, rerun with: -s
+==867450== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+echo
+
+
+
+# UNIT TEST (indextest)
+echo " indextest: load & rewrite letters.index "
+ indextest: load & rewrite letters.index 
+./indextest letters.index letters-copy.index
+echo
+
+
+echo " Compare index files with indexcmp (letters) "
+ Compare index files with indexcmp (letters) 
+/cs50/shared/tse/indexcmp letters.index letters-copy.index
+echo
+
+
+echo " valgrind: indextest (letters) "
+ valgrind: indextest (letters) 
+valgrind --leak-check=full --show-leak-kinds=all \
+    ./indextest letters.index letters-vg.index
+==867689== Memcheck, a memory error detector
+==867689== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==867689== Using Valgrind-3.25.1 and LibVEX; rerun with -h for copyright info
+==867689== Command: ./indextest letters.index letters-vg.index
+==867689== 
+==867689== 
+==867689== HEAP SUMMARY:
+==867689==     in use at exit: 0 bytes in 0 blocks
+==867689==   total heap usage: 636 allocs, 636 frees, 21,036 bytes allocated
+==867689== 
+==867689== All heap blocks were freed -- no leaks are possible
+==867689== 
+==867689== For lists of detected and suppressed errors, rerun with: -s
+==867689== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+echo
+
+
+
+echo "    ALL INDEXER TESTS DONE    "
+    ALL INDEXER TESTS DONE    
+
